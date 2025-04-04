@@ -1,14 +1,16 @@
 package com.IBMirnga.jobms.job;
 
+import com.IBMirnga.jobms.job.dto.JobDTO;
+
 import java.util.List;
 
 public interface JobService {
 
-    List<Job> findAll();
+    List<JobDTO> findAll();
 
     void createJob(Job job);
 
-    Job findJobById(Long id);
+    JobDTO findJobById(Long id);
 
     boolean deleteJobById(Long id);
 

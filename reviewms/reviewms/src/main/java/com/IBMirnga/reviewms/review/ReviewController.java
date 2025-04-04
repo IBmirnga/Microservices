@@ -1,5 +1,6 @@
 package com.IBMirnga.reviewms.review;
 
+import com.IBMirnga.reviewms.review.messaging.ReviewMessageProducer;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,8 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
+    private ReviewMessageProducer reviewMessageProducer;
+
     @GetMapping
     public ResponseEntity<List<Review>> getAllReviews(@RequestParam Long companyId) {
         return new ResponseEntity<>(reviewService.getAllReviews(companyId), HttpStatus.OK);
@@ -25,6 +28,7 @@ public class ReviewController {
     public ResponseEntity<String > makeReview(@RequestParam Long companyId, @RequestBody Review review) {
         boolean isReviewSaved = reviewService.makeReview(companyId, review);
         if (isReviewSaved) {
+            reviewMessageProducer.sendMessage(review);
             return new ResponseEntity<>("Review Added Successfully", HttpStatus.OK);
         }
             return new ResponseEntity<>("Review Not Added Successfully", HttpStatus.NOT_FOUND);
@@ -55,5 +59,11 @@ public class ReviewController {
         }
         return new ResponseEntity<>("Review Not Deleted Successfully", HttpStatus.NOT_FOUND);
 
+    }
+
+    @GetMapping("averageRating")
+    public Double getAverageReview(@RequestParam Long companyId) {
+        List<Review> reviewList = reviewService.getAllReviews(companyId);
+        return reviewList.stream().mapToDouble(Review::getRating).average().orElse(0.0);
     }
 }

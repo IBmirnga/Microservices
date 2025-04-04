@@ -1,5 +1,8 @@
 package com.IBMirnga.companyms.company;
 
+import com.IBMirnga.companyms.company.clients.ReviewClient;
+import com.IBMirnga.companyms.company.dto.ReviewMessage;
+import jakarta.ws.rs.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +14,7 @@ import java.util.Optional;
 public class CompanyServiceImpl implements CompanyService{
 
     private final CompanyRepository companyRepository;
+    private final ReviewClient reviewClient;
 
     @Override
     public List<Company> findAll() {
@@ -47,5 +51,18 @@ public class CompanyServiceImpl implements CompanyService{
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void updateCompanyRating(ReviewMessage reviewMessage) {
+        System.out.println(reviewMessage.getDescription());
+
+        Company company = companyRepository.findById(reviewMessage.getCompanyId())
+        .orElseThrow(() -> new NotFoundException("Company not found" + reviewMessage.getCompanyId()));
+
+        double averageRating = reviewClient.getAverageRatingForCompany(reviewMessage.getCompanyId());
+        company.setRating(averageRating);
+        companyRepository.save(company);
+
     }
 }

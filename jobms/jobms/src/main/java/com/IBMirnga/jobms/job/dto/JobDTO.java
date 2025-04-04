@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Data
@@ -18,6 +20,6 @@ public class JobDTO {
     private String maxSalary;
     private String location;
     private Company company;
-    private Review review;
+    private List<Review> review;
 
 }
